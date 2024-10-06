@@ -6,10 +6,10 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 const app=express();
 const port=process.env.PORT || 8000;
-
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,
-    credentials:true
+    origin:process.env.CORS_ORIGIN , // Your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true // If you need to send cookies
 }));
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
