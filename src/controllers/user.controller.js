@@ -90,43 +90,37 @@ const loginUser = asyncHandler(async (req, res) => {
         }
 
         const user = await User.findOne({ email });
-        if (!user) {
-            const admin = await Admin.findOne({ email }).select("-number");
-            if (admin && await admin.isPasswordCorrect(password)) {
-                return res.status(285).json(new ApiResponse(285, admin, "Admin exists, please verify OTP"));
+        if (user) {
+            if (await user.isPasswordCorrect(password)) {
+                const refreshToken = user.RefreshAccessToken();
+                const accessToken = user.generateAccessToken();
+                user.refreshToken = refreshToken;
+
+                await user.save();
+
+                // Send cookies and response
+                res.status(200)
+                    .cookie("refreshToken", refreshToken, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production', // Set secure based on environment
+                        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                    })
+                    .cookie("accessToken", accessToken, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        maxAge: 60 * 60 * 1000, // 1 hour
+                    })
+                    .json(new ApiResponse(200, { user }, "User logged in successfully"));
             } else {
                 throw new ApiError(401, "Password is incorrect");
             }
-        }
-
-        if (!user) {
-            throw new ApiError(404, "User does not exist");
-        }
-
-        if (user && await user.isPasswordCorrect(password)) {
-            const refreshToken = user.RefreshAccessToken();
-            const accessToken = user.generateAccessToken();
-            user.refreshToken = refreshToken;
-
-            await user.save();
-            user.password = undefined;
-            user.refreshToken = undefined;
-
-            // Send cookies and response
-            res.status(200)
-                .cookie("refreshToken", refreshToken, {
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: 7 * 24 * 60 * 60 * 1000,
-                })
-                .cookie("accessToken", accessToken, {
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: 60 * 60 * 1000,
-                })
-                .json(new ApiResponse(200, { user }, "User logged in successfully"));
         } else {
-            throw new ApiError(401, "Password is incorrect");
+            const admin = await Admin.findOne({ email }).select("-number");
+            if (admin && await admin.isPasswordCorrect(password)) {
+                return res.status(200).json(new ApiResponse(200, admin, "Admin exists, please verify OTP"));
+            } else {
+                throw new ApiError(401, "User does not exist or password is incorrect");
+            }
         }
     } catch (error) {
         // Properly send the error to the frontend
@@ -138,6 +132,7 @@ const loginUser = asyncHandler(async (req, res) => {
         });
     }
 });
+
 
 
 const logoutUser=asyncHandler(async(req,res)=>{
