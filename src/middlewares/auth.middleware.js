@@ -66,7 +66,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 60 * 60 * 1000, // 60 minutes
     });
 
