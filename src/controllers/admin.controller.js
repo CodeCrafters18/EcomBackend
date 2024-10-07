@@ -56,11 +56,13 @@ const adminlogin=asyncHandler(async(req,res)=>{
     const Roptions={
         httpOnly:true,
         secure:true,
+         sameSite: 'None',
         maxAge:24*60*60*1000,
     }
     const Aoptions={
         httpOnly:true,
         secure:true,
+         sameSite: 'None',
         maxAge:15*60*1000,
     }
         res
