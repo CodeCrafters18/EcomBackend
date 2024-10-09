@@ -33,52 +33,58 @@ const adminregister = asyncHandler(async(req,res)=>{
     }
 });
 const adminlogin=asyncHandler(async(req,res)=>{
-    const {email,password}=req.body;
-    if(!(email && password)){
-        throw new ApiError(400,"email and password both are required")
-    }
-    const admin = await Admin.findOne({email});
-    if(!admin){
-        throw new ApiError(404,"Admin does not exist")
-    }
-
-    if(admin){
-        const refreshToken=admin.RefreshAccessToken();
-        const accessToken =admin.generateAccessToken();
-        admin.refreshToken=refreshToken;
-
-        await admin.save();
-        admin.password=undefined;
-        admin.refreshToken=undefined;
-    // sending token in cookie
-    //cookie section
-
-    const Roptions={
-        httpOnly:true,
-        secure:true,
-         sameSite: 'None',
-        maxAge:24*60*60*1000,
-    }
-    const Aoptions={
-        httpOnly:true,
-        secure:true,
-         sameSite: 'None',
-        maxAge:15*60*1000,
-    }
-        res
-    .status(200)
-    .cookie("refreshToken",refreshToken,Roptions)
-    .cookie("accessToken",accessToken,Aoptions)
-    .json(
-       new ApiResponse(
-            200,
-            {
-                admin: admin
-            },
-            "Admin logged In successfully"
+    try {
+        const {email,password}=req.body;
+        if(!(email && password)){
+            throw new ApiError(400,"email and password both are required")
+        }
+        const admin = await Admin.findOne({email});
+        if(!admin){
+            throw new ApiError(404,"Admin does not exist")
+        }
+    
+        if(admin){
+            const refreshToken=admin.RefreshAccessToken();
+            const accessToken =admin.generateAccessToken();
+            admin.refreshToken=refreshToken;
+    
+            await admin.save();
+            admin.password=undefined;
+            admin.refreshToken=undefined;
+        // sending token in cookie
+        //cookie section
+    
+        const Roptions={
+            httpOnly:true,
+            secure:true,
+             sameSite: 'None',
+            maxAge:24*60*60*1000,
+        }
+        const Aoptions={
+            httpOnly:true,
+            secure:true,
+             sameSite: 'None',
+            maxAge:15*60*1000,
+        }
+            res
+        .status(200)
+        .cookie("refreshToken",refreshToken,Roptions)
+        .cookie("accessToken",accessToken,Aoptions)
+        .json(
+           new ApiResponse(
+                200,
+                {
+                    admin: admin
+                },
+                "Admin logged In successfully"
+            )
         )
-    )
-}});
+    }
+    } catch (error) {
+        console.log(error);
+    }
+
+});
 const createProduct = asyncHandler(async(req,res)=>{
     try {
         const localpath=req.files?.productImage[0]?.path;
