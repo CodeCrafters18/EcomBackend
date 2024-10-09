@@ -81,7 +81,7 @@ router.route("/verify").get(verifyJWT, (req, res) => {
     ));
   }else{
     return res.json(new ApiResponse(
-      200,
+      400,
       {
         isAuthenticated: false,
       },
