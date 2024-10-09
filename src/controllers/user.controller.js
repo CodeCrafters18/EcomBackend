@@ -109,13 +109,11 @@ const loginUser = asyncHandler(async (req, res) => {
                 .cookie("refreshToken", refreshToken, {
                     httpOnly: true,
                     secure: true,
-                    sameSite: 'None',
                     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 })
                 .cookie("accessToken", accessToken, {
                     httpOnly: true,
                     secure: true,
-                    sameSite: 'None',
                     maxAge: 60 * 60 * 1000 // 1 hour
                 })
                 .json(new ApiResponse(200, { user }, "User logged in successfully"));
@@ -145,7 +143,6 @@ const logoutUser = asyncHandler(async (req, res) => {
             const options = {
                 httpOnly: true,
                 secure: true,
-                sameSite: 'None',
             };
             return res
                 .status(200)
@@ -162,7 +159,6 @@ const logoutUser = asyncHandler(async (req, res) => {
             const options = {
                 httpOnly: true,
                 secure: true,
-                sameSite: 'None',
             };
 
             return res

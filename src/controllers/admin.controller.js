@@ -300,7 +300,7 @@ const updateorderstatus=asyncHandler(async(req,res)=>{
             new ApiResponse(200,updatedOrders,"Order status updated successfully")
         )
     } catch (error) {
-        console.log(err)
+        console.log(error)
     }
 })
 
