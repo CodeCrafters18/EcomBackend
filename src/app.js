@@ -28,5 +28,8 @@ app.use("/api",userRouter)
 app.use("/api/admin",adminRouter)
 app.use("/api/checkotp",sendOtpRouter);
 app.use("/api/payment",paymentRouter);
+app.get("/ping",(req,res)=>{
+        res.status(200).send({ status : 'ok'});
+        })
 
 export {app,port}
